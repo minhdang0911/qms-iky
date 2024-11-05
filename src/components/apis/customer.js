@@ -85,3 +85,22 @@ export const apiReceivedVehicle = async (token, id) => {
     }
     return await response.json();
 };
+
+export const apiDeleteQueue = async (token, id) => {
+    const params = new URLSearchParams();
+    params.append('id', id);
+
+    const response = await fetch('/api/customers/delete-queue', {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params.toString(),
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to delete repair category');
+    }
+    return await response.json(); // Trả về kết quả từ response
+};

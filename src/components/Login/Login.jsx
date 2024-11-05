@@ -34,12 +34,23 @@ const AuthForm = () => {
             try {
                 const response = await apiLogin(username, password);
                 const data = response;
+                console.log('data', data.msg);
 
                 if (data.result === 1 && data.msg) {
+                    // Chuyển đổi timestamp thành ngày hết hạn
+                    const expiresIn = new Date(data.msg.expires * 1000); // Chuyển đổi từ giây sang mili giây
+
+                    // Lưu access token và refresh token vào cookie
                     Cookies.set('Access token', data.msg.accessToken, {
                         httpOnly: false,
                         secure: false,
-                        expires: 1,
+                        expires: expiresIn,
+                    });
+
+                    Cookies.set('expires', expiresIn, {
+                        httpOnly: false,
+                        secure: false,
+                        expires: expiresIn,
                     });
 
                     toast.success('Đăng nhập thành công!');

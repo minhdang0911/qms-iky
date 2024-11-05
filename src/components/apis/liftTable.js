@@ -53,6 +53,25 @@ export const apiUpdateLiftTable = async (token, name, technician_id, id) => {
     return await response.json();
 };
 
+export const apiDeleteLiftTable = async (token, id) => {
+    const params = new URLSearchParams();
+    params.append('id', id);
+
+    const response = await fetch('/api/liftTables/delete', {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params.toString(),
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to delete repair category');
+    }
+    return await response.json(); // Trả về kết quả từ response
+};
+
 export const apiCreateReceptionVehicle = async (token, id, customer_id, name, license_plate) => {
     const params = new URLSearchParams();
     params.append('id', id);

@@ -22,7 +22,7 @@ import {
     ModalReturnCar,
 } from '../Modal';
 import { toast } from 'react-toastify';
-import { Modal, Button, Typography } from 'antd';
+import { Modal, Button, Typography, Tabs, Col, Row } from 'antd';
 import logo from '../../assets/img/logocompany.png';
 import Swal from 'sweetalert2';
 import CreateStore from '../Admin/Store/ManageStore';
@@ -30,9 +30,8 @@ import { FaCaretDown, FaCaretUp } from 'react-icons/fa';
 import { Accordion, Card, Table } from 'react-bootstrap';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
-import { Tabs } from 'antd';
-import { apiGetListRepair } from '../apis/liftTable';
-import { apiGetFinshList, apiReceivedVehicle } from '../apis/customer';
+import { apiDeleteLiftTable, apiGetListRepair } from '../apis/liftTable';
+import { apiGetFinshList, apiReceivedVehicle, apiDeleteQueue } from '../apis/customer';
 const { TabPane } = Tabs;
 const { Text } = Typography;
 
@@ -65,6 +64,8 @@ const Dashboard = () => {
     const [listRepair, setListRepair] = useState([]);
     const [activeRow, setActiveRow] = useState(null);
     const [finishList, setFinishList] = useState([]);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteQueueId, setDeleteQueueId] = useState(null);
 
     const navigate = useNavigate();
     const acessToken = Cookies.get('Access token');
@@ -138,17 +139,38 @@ const Dashboard = () => {
     } = icons;
 
     useEffect(() => {
-        if (!acessToken) {
-            Swal.fire({
-                title: 'Phiên đăng nhập đã hết hạn',
-                text: 'Vui lòng đăng nhập lại',
-                icon: 'warning',
-                confirmButtonText: 'OK',
-            }).then(() => {
-                navigate('/login');
-            });
+        const expires = Cookies.get('expires');
+
+        if (expires) {
+            const currentTime = Math.floor(Date.now() / 1000);
+            if (currentTime >= expires) {
+                Cookies.remove('Access token');
+                Cookies.remove('expires');
+
+                Swal.fire({
+                    title: 'Phiên đăng nhập đã hết hạn',
+                    text: 'Vui lòng đăng nhập lại',
+                    icon: 'warning',
+                    confirmButtonText: 'OK',
+                }).then(() => {
+                    navigate('/login');
+                });
+            }
         }
-    }, [acessToken, navigate]);
+    }, [navigate]);
+
+    // useEffect(() => {
+    //     if (!acessToken) {
+    //         Swal.fire({
+    //             title: 'Phiên đăng nhập đã hết hạn',
+    //             text: 'Vui lòng đăng nhập lại',
+    //             icon: 'warning',
+    //             confirmButtonText: 'OK',
+    //         }).then(() => {
+    //             navigate('/login');
+    //         });
+    //     }
+    // }, [acessToken, navigate]);
 
     const toggleModal = (modalKey) => {
         setModalStates((prev) => ({
@@ -180,10 +202,12 @@ const Dashboard = () => {
             // Cập nhật state với queueId
             setModalData((prevData) => ({
                 ...prevData,
-                [modalKey]: queueId, // Lưu _id của queue
+                [modalKey]: queueId,
             }));
         }
     };
+
+    // Lấy danh sách hàng đợi từ api
     const fetchCustomer = async () => {
         const token = Cookies.get('Access token');
 
@@ -230,6 +254,11 @@ const Dashboard = () => {
         setExpandedService((prev) => (prev === index ? null : index)); // Đóng mở bảng dịch vụ theo chỉ số
     };
 
+    // const toggleService = (index) => {
+    //     setExpandedService(expandedService === index ? null : index);
+    // };
+
+    //Lấy danh sách bàn nâng đã đưa xe vào
     const fetchListRepair = async () => {
         try {
             const token = Cookies.get('Access token');
@@ -242,7 +271,7 @@ const Dashboard = () => {
                 setListRepair(response?.msg);
             } else {
                 setListRepair([]);
-                toast.error(response.msg || 'Không tìm thấy dữ liệu'); // Hiển thị lỗi từ API nếu có
+                toast.error(response.msg || 'Không tìm thấy dữ liệu');
             }
         } catch (error) {
             console.error('Error fetching categories:', error);
@@ -258,6 +287,7 @@ const Dashboard = () => {
         setListRepair((prevList) => prevList.filter((item) => item._id !== carId));
     };
 
+    //api lấy danh sách xe chờ lấy
     const fetchFinishList = async () => {
         try {
             const token = Cookies.get('Access token');
@@ -323,6 +353,52 @@ const Dashboard = () => {
     };
 
     const token = Cookies.get('Access token');
+
+    //api xóa queue
+    const handleShowDeleteModal = (queueId) => {
+        console.log('showDeleteModal', showDeleteModal);
+        setDeleteQueueId(queueId);
+        setShowDeleteModal(true);
+    };
+    //api xóa queue
+    const handleDeleteQueue = async () => {
+        try {
+            const token = Cookies.get('Access token');
+            await apiDeleteQueue(token, deleteQueueId);
+
+            setServiceWaiting((prevServices) =>
+                prevServices.map((service) => ({
+                    ...service,
+                    queues: service.queues.filter((queue) => queue._id !== deleteQueueId),
+                })),
+            );
+            toast.success('xóa thành công');
+
+            setShowDeleteModal(false); // Ẩn modal
+        } catch (error) {
+            console.error('Failed to delete queue:', error);
+            alert('Không thể xóa hàng chờ. Vui lòng thử lại.');
+        }
+    };
+
+    //api xóa bàn nâng
+    const handleDelete = async () => {
+        try {
+            await apiDeleteLiftTable(token, activeRow);
+            // Cập nhật danh sách dữ liệu sau khi xóa thành công
+            // Giả sử bạn có một hàm setListRepair để cập nhật danh sách
+            setListRepair((prevList) => prevList.filter((item) => item._id !== activeRow));
+            toast.success('Xóa bàn nâng thành công!');
+        } catch (error) {
+            toast.error('Xóa bàn nâng thất bại!');
+        } finally {
+            setIsModalVisible(false); // Đóng modal sau khi xử lý
+        }
+    };
+
+    const showDeleteConfirm = () => {
+        setIsModalVisible(true);
+    };
 
     return (
         <>
@@ -396,7 +472,8 @@ const Dashboard = () => {
                                             </div>
                                             <div
                                                 className="cart-center"
-                                                onClick={() => handleToggleModal('isShowModalDeleteLiftingTable')}
+                                                onClick={showDeleteConfirm}
+                                                style={{ cursor: 'pointer' }}
                                             >
                                                 <IoMdCloseCircle className="icon-close" size={30} />
                                                 <p className="text-function">Xóa bản nâng</p>
@@ -530,41 +607,99 @@ const Dashboard = () => {
                             <TabPane tab="Cấu Hình" key="settings">
                                 <div className="card-grid">
                                     <div className="card">
-                                        <div className="cart-top">
-                                            <div
-                                                className="cart-center"
-                                                onClick={() => handleToggleModal('isShowModalConfigSystem')}
-                                            >
-                                                <IoSettingsOutline size={30} />
-                                                <p className="text-function">Cấu hình thông số hệ thống</p>
-                                            </div>
-                                            <div
-                                                className="cart-center"
-                                                onClick={() => handleToggleModal('isShowModalLCD')}
-                                            >
-                                                <FaFlipboard size={30} />
-                                                <p className="text-function">Cấu hình thông số thể hiện LCD</p>
-                                            </div>
-                                        </div>
+                                        <Row justify="center">
+                                            <Col span={24}>
+                                                <div className="cart-top">
+                                                    <div
+                                                        className="cart-center"
+                                                        onClick={() => handleToggleModal('isShowModalConfigSystem')}
+                                                    >
+                                                        <IoSettingsOutline size={30} />
+                                                        <Text
+                                                            style={{
+                                                                whiteSpace: 'nowrap',
+                                                                display: 'block',
+                                                                textAlign: 'center',
+                                                            }}
+                                                        >
+                                                            Cấu hình thông số
+                                                        </Text>
+                                                        <Text
+                                                            style={{
+                                                                whiteSpace: 'nowrap',
+                                                                display: 'block',
+                                                                textAlign: 'center',
+                                                            }}
+                                                        >
+                                                            hệ thống
+                                                        </Text>
+                                                    </div>
+
+                                                    <div
+                                                        className="cart-center"
+                                                        onClick={() => handleToggleModal('isShowModalLCD')}
+                                                    >
+                                                        <FaFlipboard size={30} />
+                                                        <Text
+                                                            style={{
+                                                                whiteSpace: 'nowrap',
+                                                                display: 'block',
+                                                                textAlign: 'center',
+                                                            }}
+                                                        >
+                                                            Cấu hình thông số
+                                                        </Text>
+                                                        <Text
+                                                            style={{
+                                                                whiteSpace: 'nowrap',
+                                                                display: 'block',
+                                                                textAlign: 'center',
+                                                            }}
+                                                        >
+                                                            thể hiện LCD
+                                                        </Text>
+                                                    </div>
+                                                </div>
+                                            </Col>
+                                        </Row>
                                         <p className="function">Thông tin</p>
                                     </div>
-
-                                    {/* Other cards for "Cấu Hình" */}
                                 </div>
                             </TabPane>
 
                             <TabPane tab="Import" key="import">
                                 <div className="card-grid">
                                     <div className="card">
-                                        <div className="cart-top">
-                                            <div
-                                                className="cart-center"
-                                                onClick={() => handleToggleModal('isShowModalImport')}
-                                            >
-                                                <IoDocuments size={30} />
-                                                <p className="text-function">Import danh mục thời gian sửa chữa</p>
-                                            </div>
-                                        </div>
+                                        <Row justify="center">
+                                            <Col span={24}>
+                                                <div className="cart-top">
+                                                    <div
+                                                        className="cart-center"
+                                                        onClick={() => handleToggleModal('isShowModalImport')}
+                                                    >
+                                                        <IoDocuments size={30} />
+                                                        <Text
+                                                            style={{
+                                                                whiteSpace: 'nowrap',
+                                                                display: 'block',
+                                                                textAlign: 'center',
+                                                            }}
+                                                        >
+                                                            Import danh mục
+                                                        </Text>
+                                                        <Text
+                                                            style={{
+                                                                whiteSpace: 'nowrap',
+                                                                display: 'block',
+                                                                textAlign: 'center',
+                                                            }}
+                                                        >
+                                                            thời gian sửa chữa
+                                                        </Text>
+                                                    </div>
+                                                </div>
+                                            </Col>
+                                        </Row>
                                         <p className="function">Import</p>
                                     </div>
                                 </div>
@@ -573,26 +708,47 @@ const Dashboard = () => {
                             <TabPane tab="Trợ Giúp" key="help">
                                 <div className="card-grid">
                                     <div className="card">
-                                        <div className="cart-top">
-                                            <a
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                href="https://iky.vn/"
-                                                style={{ textDecoration: 'none' }}
-                                            >
-                                                <div className="cart-center">
-                                                    <FaEarthAmericas size={30} />
-                                                    <p className="text-function">Trang chủ</p>
+                                        <Row justify="center">
+                                            <Col span={24}>
+                                                <div className="cart-top">
+                                                    <div className="cart-center">
+                                                        <a
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            href="https://iky.vn/"
+                                                            style={{ textDecoration: 'none' }}
+                                                        >
+                                                            <FaEarthAmericas size={30} />
+                                                            <Text
+                                                                style={{
+                                                                    whiteSpace: 'nowrap',
+                                                                    display: 'block',
+                                                                    textAlign: 'center',
+                                                                }}
+                                                            >
+                                                                Trang chủ
+                                                            </Text>
+                                                        </a>
+                                                    </div>
+
+                                                    <div
+                                                        className="cart-center"
+                                                        onClick={() => handleToggleModal('isShowModalInfomation')}
+                                                    >
+                                                        <HiQuestionMarkCircle size={30} />
+                                                        <Text
+                                                            style={{
+                                                                whiteSpace: 'nowrap',
+                                                                display: 'block',
+                                                                textAlign: 'center',
+                                                            }}
+                                                        >
+                                                            Phiên bản
+                                                        </Text>
+                                                    </div>
                                                 </div>
-                                            </a>
-                                            <div
-                                                className="cart-center"
-                                                onClick={() => handleToggleModal('isShowModalInfomation')}
-                                            >
-                                                <HiQuestionMarkCircle size={30} />
-                                                <p className="text-function">Phiên bản</p>
-                                            </div>
-                                        </div>
+                                            </Col>
+                                        </Row>
                                         <p className="function">Thông tin</p>
                                     </div>
                                 </div>
@@ -861,7 +1017,7 @@ const Dashboard = () => {
                                                                     whiteSpace: 'nowrap',
                                                                 }}
                                                             >
-                                                                Bàn nâng
+                                                                <Text> Bàn nâng</Text>
                                                             </th>
                                                             <th
                                                                 style={{
@@ -870,7 +1026,7 @@ const Dashboard = () => {
                                                                     whiteSpace: 'nowrap',
                                                                 }}
                                                             >
-                                                                Kĩ Thuật Viên
+                                                                <Text>Kĩ Thuật Viên</Text>
                                                             </th>
                                                             <th
                                                                 style={{
@@ -879,7 +1035,7 @@ const Dashboard = () => {
                                                                     whiteSpace: 'nowrap',
                                                                 }}
                                                             >
-                                                                Nội dung thông báo
+                                                                <Text> Nội dung thông báo</Text>
                                                             </th>
                                                             <th
                                                                 style={{
@@ -888,7 +1044,7 @@ const Dashboard = () => {
                                                                     whiteSpace: 'nowrap',
                                                                 }}
                                                             >
-                                                                TRẠNG THÁI
+                                                                <Text> TRẠNG THÁI</Text>
                                                             </th>
                                                             <th
                                                                 style={{
@@ -897,7 +1053,7 @@ const Dashboard = () => {
                                                                     whiteSpace: 'nowrap',
                                                                 }}
                                                             >
-                                                                Số thẻ
+                                                                <Text> Số thẻ</Text>
                                                             </th>
                                                             <th
                                                                 style={{
@@ -906,7 +1062,7 @@ const Dashboard = () => {
                                                                     whiteSpace: 'nowrap',
                                                                 }}
                                                             >
-                                                                Khách Hàng
+                                                                <Text> Khách Hàng</Text>
                                                             </th>
                                                             <th
                                                                 style={{
@@ -915,7 +1071,7 @@ const Dashboard = () => {
                                                                     whiteSpace: 'nowrap',
                                                                 }}
                                                             >
-                                                                Biển số xe
+                                                                <Text>Biển số xe</Text>
                                                             </th>
                                                             <th
                                                                 style={{
@@ -924,7 +1080,8 @@ const Dashboard = () => {
                                                                     whiteSpace: 'nowrap',
                                                                 }}
                                                             >
-                                                                TG sửa chữa
+                                                                {/* TG sửa chữa */}
+                                                                <Text> TG bắt đầu sửa chữa</Text>
                                                             </th>
                                                             <th
                                                                 style={{
@@ -933,7 +1090,8 @@ const Dashboard = () => {
                                                                     whiteSpace: 'nowrap',
                                                                 }}
                                                             >
-                                                                TG còn lại
+                                                                {/* TG còn lại */}
+                                                                <Text>TG dự kiến hoàn thành</Text>
                                                             </th>
                                                         </tr>
                                                     </thead>
@@ -954,44 +1112,54 @@ const Dashboard = () => {
                                                                     }}
                                                                     onClick={() => setActiveRow(item._id)}
                                                                 >
-                                                                    <td style={{ padding: '8px 16px' }}>{item.name}</td>
                                                                     <td style={{ padding: '8px 16px' }}>
-                                                                        {item.technician}
+                                                                        <Text>{item.name}</Text>
+                                                                    </td>
+                                                                    <td style={{ padding: '8px 16px' }}>
+                                                                        <Text> {item.technician}</Text>
                                                                     </td>
                                                                     <td style={{ padding: '8px 16px' }}>
                                                                         {/* Additional info if available */}
                                                                     </td>
-                                                                    <td style={{ padding: '8px 16px' }}>Đang sửa</td>
+                                                                    <td style={{ padding: '8px 16px' }}>
+                                                                        <Text>Đang sửa</Text>
+                                                                    </td>
                                                                     <td style={{ padding: '8px 16px' }}>
                                                                         {/* Card number if available */}
                                                                     </td>
                                                                     <td style={{ padding: '8px 16px' }}>
-                                                                        {item.customers.name}
+                                                                        <Text> {item.customers.name}</Text>
                                                                     </td>
                                                                     <td style={{ padding: '8px 16px' }}>
-                                                                        {item.customers.license_plate}
+                                                                        <Text> {item.customers.license_plate}</Text>
                                                                     </td>
                                                                     <td style={{ padding: '8px 16px' }}>
-                                                                        {new Date(
-                                                                            item.customers.time_start,
-                                                                        ).toLocaleDateString()}{' '}
-                                                                        {new Date(
-                                                                            item.customers.time_start,
-                                                                        ).toLocaleTimeString([], {
-                                                                            hour: '2-digit',
-                                                                            minute: '2-digit',
-                                                                        })}
+                                                                        <Text>
+                                                                            {' '}
+                                                                            {new Date(
+                                                                                item.customers.time_start,
+                                                                            ).toLocaleDateString()}{' '}
+                                                                            {new Date(
+                                                                                item.customers.time_start,
+                                                                            ).toLocaleTimeString([], {
+                                                                                hour: '2-digit',
+                                                                                minute: '2-digit',
+                                                                            })}
+                                                                        </Text>
                                                                     </td>
                                                                     <td style={{ padding: '8px 16px' }}>
-                                                                        {new Date(
-                                                                            item.customers.time_end,
-                                                                        ).toLocaleDateString()}{' '}
-                                                                        {new Date(
-                                                                            item.customers.time_end,
-                                                                        ).toLocaleTimeString([], {
-                                                                            hour: '2-digit',
-                                                                            minute: '2-digit',
-                                                                        })}
+                                                                        <Text>
+                                                                            {' '}
+                                                                            {new Date(
+                                                                                item.customers.time_end,
+                                                                            ).toLocaleDateString()}{' '}
+                                                                            {new Date(
+                                                                                item.customers.time_end,
+                                                                            ).toLocaleTimeString([], {
+                                                                                hour: '2-digit',
+                                                                                minute: '2-digit',
+                                                                            })}
+                                                                        </Text>
                                                                     </td>
                                                                 </tr>
                                                             ))}
@@ -1034,19 +1202,31 @@ const Dashboard = () => {
                                                                     <Table bordered hover responsive>
                                                                         <thead>
                                                                             <tr>
-                                                                                <th>Số thẻ</th>
+                                                                                <th>
+                                                                                    <Text>Số thẻ</Text>
+                                                                                </th>
                                                                                 {/* <th>Họ tên</th>
                                                                          <th>BIỂN SỐ XE</th> */}
 
-                                                                                <th>THỜI GIAN</th>
-                                                                                <th>Nhận</th>
-                                                                                <th>Trả</th>
+                                                                                <th>
+                                                                                    <Text>THỜI GIAN</Text>
+                                                                                </th>
+                                                                                <th>
+                                                                                    <Text>Nhận</Text>
+                                                                                </th>
+                                                                                <th>
+                                                                                    <Text>Trả</Text>
+                                                                                </th>
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody>
                                                                             {service.queues.map((queue, queueIndex) => (
                                                                                 <tr key={queueIndex}>
-                                                                                    <td>{queue.serial_number}</td>
+                                                                                    <td>
+                                                                                        <Text>
+                                                                                            {queue.serial_number}
+                                                                                        </Text>
+                                                                                    </td>
                                                                                     {/* <td>
                                                                                  {service.customer ||
                                                                                      service.name ||
@@ -1055,9 +1235,12 @@ const Dashboard = () => {
                                                                              <td>{service.licensePlate || 'N/A'}</td> */}
 
                                                                                     <td>
-                                                                                        {new Date(
-                                                                                            queue.created_at,
-                                                                                        ).toLocaleString()}
+                                                                                        <Text>
+                                                                                            {' '}
+                                                                                            {new Date(
+                                                                                                queue.created_at,
+                                                                                            ).toLocaleString()}
+                                                                                        </Text>
                                                                                     </td>
                                                                                     <td className="status-cell">
                                                                                         <span
@@ -1072,7 +1255,14 @@ const Dashboard = () => {
                                                                                             ✓
                                                                                         </span>
                                                                                     </td>
-                                                                                    <td className="status-cell">
+                                                                                    <td
+                                                                                        className="status-cell"
+                                                                                        onClick={() =>
+                                                                                            handleShowDeleteModal(
+                                                                                                queue._id,
+                                                                                            )
+                                                                                        }
+                                                                                    >
                                                                                         <span className="status status-cancel">
                                                                                             X
                                                                                         </span>
@@ -1187,7 +1377,6 @@ const Dashboard = () => {
                     </div>
                 </div>
             )}
-
             <Modal
                 title="Xác nhận xóa"
                 visible={isModalVisible}
@@ -1198,20 +1387,30 @@ const Dashboard = () => {
                 <p>Bạn có chắc chắn muốn xóa khách hàng này không?</p>
             </Modal>
 
+            {/* modal xóa xe khỏi hàng chờ */}
             <Modal
-                title="Xác nhận xóa"
-                open={showConfirm}
-                onCancel={() => setShowConfirm(false)}
+                title="Xóa hàng chờ"
+                open={showDeleteModal}
+                onCancel={() => setShowDeleteModal(false)}
                 footer={[
-                    <Button key="cancel" onClick={() => setShowConfirm(false)}>
+                    <Button key="cancel" onClick={() => setShowDeleteModal(false)}>
                         Hủy
                     </Button>,
-                    <Button key="delete" type="danger">
+                    <Button key="delete" type="primary" danger onClick={handleDeleteQueue}>
                         Xóa
                     </Button>,
                 ]}
             >
-                <p>Bạn có chắc chắn muốn xóa bản nâng này?</p>
+                <p>Bạn có chắc muốn xóa dịch vụ này khỏi hàng chờ?</p>
+            </Modal>
+
+            <Modal
+                title="Xác nhận xóa"
+                visible={isModalVisible}
+                onOk={handleDelete}
+                onCancel={() => setIsModalVisible(false)}
+            >
+                <p>Bạn có chắc chắn muốn xóa bàn nâng này không?</p>
             </Modal>
         </>
         // <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>

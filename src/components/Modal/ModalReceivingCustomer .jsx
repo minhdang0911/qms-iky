@@ -11,7 +11,7 @@ import { apiGetCategory } from '../apis/category';
 import { apiAddCustomerCategory, apiGetRepairList, apiDeleteRepairCategory } from '../apis/customer'; // Import thêm apiDeleteRepairCategory
 import Cookies from 'js-cookie';
 
-const ModalReceivingCustomer = ({ isShowModal, onClose, queueId, onUpdateCars }) => {
+const ModalReceivingCustomer = ({ isShowModal, onClose, queueId, onCustomer, onUpdateCars }) => {
     const [isOpen, setIsOpen] = useState(true);
     const [selectedService, setSelectedService] = useState('');
     const [liftTable, setLiftTable] = useState([]);
@@ -102,8 +102,9 @@ const ModalReceivingCustomer = ({ isShowModal, onClose, queueId, onUpdateCars })
         try {
             await apiCreateReceptionVehicle(token, selectedLiftTable, queueId, name, licensePlate);
             onUpdateCars();
+            onCustomer();
             toast.success('Tiếp nhận phương tiện thành công!');
-            onClose(); // Đóng modal sau khi gọi API thành công
+            onClose();
         } catch (error) {
             toast.error('Lỗi khi tiếp nhận phương tiện: ' + error.message);
         }
