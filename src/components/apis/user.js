@@ -1,5 +1,5 @@
 export const apiLogin = async (username, password) => {
-    const response = await fetch(`https://qms-admin.iky.vn/api/users/token?grant_type=password&username=${username}&password=${password}`, {
+    const response = await fetch(`https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/users/token?grant_type=password&username=${username}&password=${password}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -17,7 +17,7 @@ export const apiChangePassword = async (token, currentPassword, newPassword, con
     formData.append('new_password', newPassword);
     formData.append('confirm_password', confirmPassword);
 
-    const response = await fetch('https://qms-admin.iky.vn/api/users/change-password', {
+    const response = await fetch('https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/users/change-password', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
