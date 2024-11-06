@@ -1,5 +1,5 @@
 export const apiGetTechnical = async (token) => {
-    const response = await fetch('/api/technicians/list', {
+    const response = await fetch('https://qms-admin.iky.vn/api/technicians/list', {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -17,7 +17,7 @@ export const apiCreateTechnical = async (token, name, phone) => {
     params.append('name', name);
     params.append('phone', phone);
 
-    const response = await fetch('/api/technicians/add', {
+    const response = await fetch('https://qms-admin.iky.vn/api/technicians/add', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -37,7 +37,7 @@ export const apiUpdateTechnical = async (token, name, phone, id) => {
     params.append('name', name);
     params.append('phone', phone);
     params.append('id', id);
-    const response = await fetch('/api/technicians/edit', {
+    const response = await fetch('https://qms-admin.iky.vn/api/technicians/edit', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -53,7 +53,7 @@ export const apiUpdateTechnical = async (token, name, phone, id) => {
 };
 
 export const apiDeleteTechnical = async (token, id) => {
-    const response = await fetch('/api/technicians/delete', {
+    const response = await fetch('https://qms-admin.iky.vn/api/technicians/delete', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
