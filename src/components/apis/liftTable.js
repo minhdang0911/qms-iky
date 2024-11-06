@@ -1,5 +1,5 @@
 export const apiGetLiftTable = async (token) => {
-    const response = await fetch('https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/liftTables/list', {
+    const response = await fetch('https://qms-admin.iky.vn/api/liftTables/list', {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -18,7 +18,7 @@ export const apiCreateLiftTable = async (token, name, technician_id, decription)
     params.append('technician_id', technician_id);
     params.append('decription', decription);
 
-    const response = await fetch('https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/liftTables/add', {
+    const response = await fetch('https://qms-admin.iky.vn/api/liftTables/add', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -38,7 +38,7 @@ export const apiUpdateLiftTable = async (token, name, technician_id, id) => {
     params.append('name', name);
     params.append('technician_id', technician_id);
     params.append('id', id);
-    const response = await fetch('https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/liftTables/edit', {
+    const response = await fetch('https://qms-admin.iky.vn/api/liftTables/edit', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -57,7 +57,7 @@ export const apiDeleteLiftTable = async (token, id) => {
     const params = new URLSearchParams();
     params.append('id', id);
 
-    const response = await fetch('https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/liftTables/delete', {
+    const response = await fetch('https://qms-admin.iky.vn/api/liftTables/delete', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -79,7 +79,7 @@ export const apiCreateReceptionVehicle = async (token, id, customer_id, name, li
     params.append('customer_id', customer_id);
     params.append('license_plate', license_plate);
 
-    const response = await fetch('https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/liftTables/reception-vehicle', {
+    const response = await fetch('https://qms-admin.iky.vn/api/liftTables/reception-vehicle', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -96,7 +96,7 @@ export const apiCreateReceptionVehicle = async (token, id, customer_id, name, li
 
 // api đưa xe lên bàn nâng
 export const apiGetListRepair = async (token) => {
-    const response = await fetch('https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/liftTables/repair-list', {
+    const response = await fetch('https://qms-admin.iky.vn/api/liftTables/repair-list', {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -114,7 +114,7 @@ export const apiGetListRepair = async (token) => {
 export const apiLiftTableReturnVehicle = async (token, id) => {
     const params = new URLSearchParams();
     params.append('id', id);
-    const response = await fetch('https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/liftTables/return-vehicle', {
+    const response = await fetch('https://qms-admin.iky.vn/api/liftTables/return-vehicle', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
