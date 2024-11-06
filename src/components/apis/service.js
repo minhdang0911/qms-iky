@@ -1,5 +1,5 @@
 export const apiGetServies = async (token) => {
-    const response = await fetch('/api/services/list', {
+    const response = await fetch('https://qms-admin.iky.vn/api/services/list', {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -18,7 +18,7 @@ export const apiCreateServies = async (token, name, time, serialNumberStart) => 
     params.append('time', time);
     params.append('serial_number_start', serialNumberStart); // Thêm trường serial_number_start
 
-    const response = await fetch('/api/services/add', {
+    const response = await fetch('https://qms-admin.iky.vn/api/services/add', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -34,7 +34,7 @@ export const apiCreateServies = async (token, name, time, serialNumberStart) => 
 };
 
 export const apiDeleteServies = async (token, id) => {
-    const response = await fetch('/api/services/delete', {
+    const response = await fetch('https://qms-admin.iky.vn/api/services/delete', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
