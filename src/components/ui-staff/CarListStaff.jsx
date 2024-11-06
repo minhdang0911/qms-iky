@@ -32,6 +32,9 @@ import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 import { apiDeleteLiftTable, apiGetListRepair } from '../apis/liftTable';
 import { apiGetFinshList, apiReceivedVehicle, apiDeleteQueue } from '../apis/customer';
+import GetSerialNumber from '../serial/GetSerialNumber';
+import { useSerial } from '../SerialContext';
+import { CSSTransition } from 'react-transition-group';
 const { TabPane } = Tabs;
 const { Text } = Typography;
 
@@ -55,9 +58,10 @@ const Dashboard = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [customerToDelete, setCustomerToDelete] = useState(null);
     // const [selectedCar, setSelectedCar] = useState(null); // State lưu dữ liệu của hàng được chọn
+    const [isModalSerial, setIsModalSerial] = useState(false);
 
     //api thực tế
-    const [serviceWating, setServiceWaiting] = useState([]);
+
     const [expandedRows, setExpandedRows] = useState({});
     const [expandedService, setExpandedService] = useState(null);
     const [modalData, setModalData] = useState('');
@@ -69,6 +73,8 @@ const Dashboard = () => {
 
     const navigate = useNavigate();
     const acessToken = Cookies.get('Access token');
+    const [serviceWaiting, setServiceWaiting] = useState([]);
+    const [serialData, setSerialData] = useState(null);
 
     const modals = [
         { key: 'isShowModalCreateLiftingTable', component: Modalcreateliftingtable },
@@ -159,6 +165,21 @@ const Dashboard = () => {
         }
     }, [navigate]);
 
+    useEffect(() => {
+        const token1 = Cookies.get('Access token');
+        if (!token1) {
+            // Hiển thị thông báo nếu không có token
+            Swal.fire({
+                icon: 'error',
+                title: 'Phiên bản hết hạn!',
+                text: 'Vui lòng đăng nhập lại để tiếp tục sử dụng.',
+                confirmButtonText: 'OK',
+            }).then(() => {
+                navigate('/login');
+            });
+        }
+    }, [acessToken]);
+
     // useEffect(() => {
     //     if (!acessToken) {
     //         Swal.fire({
@@ -210,7 +231,6 @@ const Dashboard = () => {
     // Lấy danh sách hàng đợi từ api
     const fetchCustomer = async () => {
         const token = Cookies.get('Access token');
-
         try {
             const response = await fetch('/api/customers/queue-list', {
                 method: 'GET',
@@ -225,9 +245,7 @@ const Dashboard = () => {
             }
 
             const data = await response.json();
-            console.log('data', data);
             setServiceWaiting(data.msg);
-            console.log(serviceWating);
         } catch (error) {
             console.error('Error fetching customer data:', error);
         }
@@ -316,8 +334,8 @@ const Dashboard = () => {
         fetchFinishList();
     };
 
-    const handleFetchCustomer = () => {
-        fetchCustomer();
+    const handleFetchCustomer = (newSerialInfo) => {
+        fetchCustomer(); // Gọi hàm fetch nếu cần
     };
 
     // xóa xe khỏi danh sách chờ lấy
@@ -356,7 +374,6 @@ const Dashboard = () => {
 
     //api xóa queue
     const handleShowDeleteModal = (queueId) => {
-        console.log('showDeleteModal', showDeleteModal);
         setDeleteQueueId(queueId);
         setShowDeleteModal(true);
     };
@@ -400,11 +417,33 @@ const Dashboard = () => {
         setIsModalVisible(true);
     };
 
+    //cập nhật ngay dữ liệu khi bốc số
+    const handleAddSerialNumber = (newSerial) => {
+        console.log('handleAddSerialNumber called with:', newSerial);
+        setServiceWaiting((prevServiceWaiting) => {
+            return [...prevServiceWaiting, newSerial];
+        });
+    };
+
+    //bốc số
+    const showModal = () => {
+        setIsModalSerial(true);
+    };
+
+    const handleOk = () => {
+        setIsModalSerial(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalSerial(false);
+    };
+
     return (
         <>
-            {token && (
+            {token ? (
                 <div className="dashboard-container">
                     {!hideStore && <CreateStore dataUser={data} />}
+
                     {modals.map(
                         ({ key, component: ModalComponent }) =>
                             modalStates[key] && (
@@ -446,7 +485,18 @@ const Dashboard = () => {
                             )} */}
 
                             {token ? (
-                                <FiLogOut onClick={handleLogout} className="icon logout-icon" title="Đăng xuất" />
+                                <>
+                                    <Button
+                                        color="danger"
+                                        variant="solid"
+                                        onClick={showModal}
+                                        style={{ marginRight: '10px' }}
+                                    >
+                                        Bốc số thứ tự
+                                    </Button>
+
+                                    <FiLogOut onClick={handleLogout} className="icon logout-icon" title="Đăng xuất" />
+                                </>
                             ) : (
                                 <div></div>
                             )}
@@ -1172,8 +1222,9 @@ const Dashboard = () => {
                                         {/* api thực tế */}
                                         <div className="active-table">
                                             <h4 className="active-table-title">DANH SÁCH DỊCH VỤ</h4>
+
                                             <Accordion>
-                                                {serviceWating.map((service, index) => (
+                                                {serviceWaiting.map((service, index) => (
                                                     <Card key={index} className="mb-2">
                                                         <Card.Header>
                                                             <div className="d-flex justify-content-between align-items-center">
@@ -1376,7 +1427,7 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
-            )}
+            ) : null}
             <Modal
                 title="Xác nhận xóa"
                 visible={isModalVisible}
@@ -1412,6 +1463,23 @@ const Dashboard = () => {
             >
                 <p>Bạn có chắc chắn muốn xóa bàn nâng này không?</p>
             </Modal>
+
+            <CSSTransition in={isModalSerial} timeout={300} classNames="fade" unmountOnExit>
+                <Modal
+                    title="Bóc Số"
+                    visible={isModalSerial}
+                    onOk={handleOk}
+                    onCancel={handleCancel}
+                    footer={null}
+                    centered={true}
+                    className="custom-modal"
+                    destroyOnClose={true} //
+                >
+                    <div className="modal-content">
+                        <GetSerialNumber onSerialNumberFetched={handleFetchCustomer} />
+                    </div>
+                </Modal>
+            </CSSTransition>
         </>
         // <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
         //     <Modal.Header closeButton>
