@@ -1,5 +1,5 @@
 export const apiGetCategory = async (token) => {
-    const response = await fetch('https://qms-admin.iky.vn/api/repairCategories/list', {
+    const response = await fetch('https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/repairCategories/list', {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -18,7 +18,7 @@ export const apiCreateCategory = async (token, name, shortName, time) => {
     params.append('short_name', shortName);
     params.append('time', time);
 
-    const response = await fetch('https://qms-admin.iky.vn/api/repairCategories/add', {
+    const response = await fetch('https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/repairCategories/add', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -34,7 +34,7 @@ export const apiCreateCategory = async (token, name, shortName, time) => {
 };
 
 export const apiDeleteCategory = async (token, id) => {
-    const response = await fetch('https://qms-admin.iky.vn/api/repairCategories/delete', {
+    const response = await fetch('https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/repairCategories/delete', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -56,7 +56,7 @@ export const apiUpdateCategory = async (token, id, name, shortName, time) => {
     params.append('short_name', shortName);
     params.append('time', time);
 
-    const response = await fetch('https://qms-admin.iky.vn/api/repairCategories/edit', {
+    const response = await fetch('https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/repairCategories/edit', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
