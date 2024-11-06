@@ -1095,7 +1095,7 @@ const Dashboard = () => {
                                                             >
                                                                 <Text> TRẠNG THÁI</Text>
                                                             </th>
-                                                            <th
+                                                            {/* <th
                                                                 style={{
                                                                     padding: '8px 16px',
                                                                     textAlign: 'left',
@@ -1103,7 +1103,7 @@ const Dashboard = () => {
                                                                 }}
                                                             >
                                                                 <Text> Số thẻ</Text>
-                                                            </th>
+                                                            </th> */}
                                                             <th
                                                                 style={{
                                                                     padding: '8px 16px',
@@ -1145,73 +1145,74 @@ const Dashboard = () => {
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {listRepair
-                                                            ?.filter((item) => item.customers)
-                                                            .map((item) => (
-                                                                <tr
-                                                                    key={item._id}
-                                                                    style={{
-                                                                        cursor: 'pointer',
-                                                                        fontWeight:
-                                                                            activeRow === item._id ? 'bold' : 'normal',
-                                                                        backgroundColor:
-                                                                            activeRow === item._id
-                                                                                ? '#f0f0f0'
-                                                                                : 'transparent',
-                                                                    }}
-                                                                    onClick={() => setActiveRow(item._id)}
-                                                                >
-                                                                    <td style={{ padding: '8px 16px' }}>
-                                                                        <Text>{item.name}</Text>
-                                                                    </td>
-                                                                    <td style={{ padding: '8px 16px' }}>
-                                                                        <Text> {item.technician}</Text>
-                                                                    </td>
-                                                                    <td style={{ padding: '8px 16px' }}>
-                                                                        {/* Additional info if available */}
-                                                                    </td>
-                                                                    <td style={{ padding: '8px 16px' }}>
-                                                                        <Text>Đang sửa</Text>
-                                                                    </td>
-                                                                    <td style={{ padding: '8px 16px' }}>
-                                                                        {/* Card number if available */}
-                                                                    </td>
-                                                                    <td style={{ padding: '8px 16px' }}>
-                                                                        <Text> {item.customers.name}</Text>
-                                                                    </td>
-                                                                    <td style={{ padding: '8px 16px' }}>
-                                                                        <Text> {item.customers.license_plate}</Text>
-                                                                    </td>
-                                                                    <td style={{ padding: '8px 16px' }}>
-                                                                        <Text>
-                                                                            {' '}
-                                                                            {new Date(
-                                                                                item.customers.time_start,
-                                                                            ).toLocaleDateString()}{' '}
-                                                                            {new Date(
-                                                                                item.customers.time_start,
-                                                                            ).toLocaleTimeString([], {
-                                                                                hour: '2-digit',
-                                                                                minute: '2-digit',
-                                                                            })}
-                                                                        </Text>
-                                                                    </td>
-                                                                    <td style={{ padding: '8px 16px' }}>
-                                                                        <Text>
-                                                                            {' '}
-                                                                            {new Date(
-                                                                                item.customers.time_end,
-                                                                            ).toLocaleDateString()}{' '}
-                                                                            {new Date(
-                                                                                item.customers.time_end,
-                                                                            ).toLocaleTimeString([], {
-                                                                                hour: '2-digit',
-                                                                                minute: '2-digit',
-                                                                            })}
-                                                                        </Text>
-                                                                    </td>
-                                                                </tr>
-                                                            ))}
+                                                        {listRepair?.map((item) => (
+                                                            <tr
+                                                                key={item._id}
+                                                                style={{
+                                                                    cursor: 'pointer',
+                                                                    fontWeight:
+                                                                        activeRow === item._id ? 'bold' : 'normal',
+                                                                    backgroundColor:
+                                                                        activeRow === item._id
+                                                                            ? '#f0f0f0'
+                                                                            : 'transparent',
+                                                                }}
+                                                                onClick={() => setActiveRow(item._id)}
+                                                            >
+                                                                <td style={{ padding: '8px 16px' }}>
+                                                                    <Text>{item.name}</Text>
+                                                                </td>
+                                                                <td style={{ padding: '8px 16px' }}>
+                                                                    <Text>{item.technician}</Text>
+                                                                </td>
+                                                                <td style={{ padding: '8px 16px' }}>
+                                                                    {/* Additional info if available */}
+                                                                </td>
+                                                                <td style={{ padding: '8px 16px' }}>
+                                                                    {item?.customers
+                                                                        ? 'Đang sửa'
+                                                                        : 'Chưa có khách hàng'}
+                                                                </td>
+
+                                                                {/* <td style={{ padding: '8px 16px' }}>
+                                                                    
+                                                                </td> */}
+                                                                <td style={{ padding: '8px 16px' }}>
+                                                                    <Text>{item.customers?.name}</Text>
+                                                                </td>
+                                                                <td style={{ padding: '8px 16px' }}>
+                                                                    <Text>{item.customers?.license_plate}</Text>
+                                                                </td>
+                                                                <td style={{ padding: '8px 16px' }}>
+                                                                    <Text>
+                                                                        {item.customers
+                                                                            ? `${new Date(
+                                                                                  item.customers.time_start,
+                                                                              ).toLocaleDateString()} ${new Date(
+                                                                                  item.customers.time_start,
+                                                                              ).toLocaleTimeString([], {
+                                                                                  hour: '2-digit',
+                                                                                  minute: '2-digit',
+                                                                              })}`
+                                                                            : ''}
+                                                                    </Text>
+                                                                </td>
+                                                                <td style={{ padding: '8px 16px' }}>
+                                                                    <Text>
+                                                                        {item.customers
+                                                                            ? `${new Date(
+                                                                                  item.customers.time_end,
+                                                                              ).toLocaleDateString()} ${new Date(
+                                                                                  item.customers.time_end,
+                                                                              ).toLocaleTimeString([], {
+                                                                                  hour: '2-digit',
+                                                                                  minute: '2-digit',
+                                                                              })}`
+                                                                            : ''}
+                                                                    </Text>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -1341,7 +1342,7 @@ const Dashboard = () => {
                                                 <thead>
                                                     <tr>
                                                         <th>
-                                                            <Text>Số thẻ</Text>
+                                                            <Text>Số thứ tự</Text>
                                                         </th>
                                                         <th>
                                                             <Text>Họ tên</Text>
