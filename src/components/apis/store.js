@@ -1,5 +1,5 @@
 export const apiStoreInfo = async (token) => {
-    const response = await fetch('/api/stores/info', {
+    const response = await fetch('https://qms-admin.iky.vn/api/stores/info', {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
