@@ -1,5 +1,5 @@
 export const apiGetRepairList = async (token, id) => {
-    const response = await fetch(`https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/customers/repair-list?id=${id}`, {
+    const response = await fetch(`https://qms-admin.iky.vn/api/customers/repair-list?id=${id}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -17,7 +17,7 @@ export const apiAddCustomerCategory = async (token, id, repairCategoryId) => {
     params.append('id', id);
     params.append('repairCategory_id', repairCategoryId);
 
-    const response = await fetch('https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/customers/add-repairCategory', {
+    const response = await fetch('https://qms-admin.iky.vn/api/customers/add-repairCategory', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -37,7 +37,7 @@ export const apiDeleteRepairCategory = async (token, id, repairId) => {
     params.append('id', id);
     params.append('repair_id', repairId);
 
-    const response = await fetch('https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/customers/delete-repairCategory', {
+    const response = await fetch('https://qms-admin.iky.vn/api/customers/delete-repairCategory', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -54,7 +54,7 @@ export const apiDeleteRepairCategory = async (token, id, repairId) => {
 
 //api hiển thị danh sách xe chờ lấy
 export const apiGetFinshList = async (token, id) => {
-    const response = await fetch(`https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/customers/finish-list`, {
+    const response = await fetch(`https://qms-admin.iky.vn/api/customers/finish-list`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -71,7 +71,7 @@ export const apiGetFinshList = async (token, id) => {
 export const apiReceivedVehicle = async (token, id) => {
     const params = new URLSearchParams();
     params.append('id', id);
-    const response = await fetch('https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/customers/received-vehicle', {
+    const response = await fetch('https://qms-admin.iky.vn/api/customers/received-vehicle', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -90,7 +90,7 @@ export const apiDeleteQueue = async (token, id) => {
     const params = new URLSearchParams();
     params.append('id', id);
 
-    const response = await fetch('https://cors-anywhere.herokuapp.com/https://qms-admin.iky.vn/api/customers/delete-queue', {
+    const response = await fetch('https://qms-admin.iky.vn/api/customers/delete-queue', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
