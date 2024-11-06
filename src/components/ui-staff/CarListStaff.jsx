@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './carliststaff.scss';
 import icons from '../../Utils/icons';
 import {
@@ -33,7 +33,6 @@ import { useNavigate } from 'react-router-dom';
 import { apiDeleteLiftTable, apiGetListRepair } from '../apis/liftTable';
 import { apiGetFinshList, apiReceivedVehicle, apiDeleteQueue } from '../apis/customer';
 import GetSerialNumber from '../serial/GetSerialNumber';
-import { useSerial } from '../SerialContext';
 import { CSSTransition } from 'react-transition-group';
 const { TabPane } = Tabs;
 const { Text } = Typography;
