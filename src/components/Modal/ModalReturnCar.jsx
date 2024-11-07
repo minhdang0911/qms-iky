@@ -13,8 +13,12 @@ const ModalReturnCar = ({ isShowModal, onClose, selectedCar, onDelete, onFinishC
         setIsOpen((prev) => !prev);
     };
 
+    // Kiểm tra sự tồn tại của customers trong selectedCar
+    const hasCustomer = selectedCar && selectedCar.customers && Object.keys(selectedCar.customers).length > 0;
+
     const { _id } = selectedCar;
     const token = Cookies.get('Access token');
+
     const HandleReturnVehicle = async () => {
         const response = await apiLiftTableReturnVehicle(token, _id);
         if (response.result === 1) {
@@ -54,11 +58,22 @@ const ModalReturnCar = ({ isShowModal, onClose, selectedCar, onDelete, onFinishC
                                 </div>
                                 <div
                                     className="d-flex justify-content-between align-items-center"
-                                    style={{ cursor: 'pointer' }}
-                                    onClick={HandleReturnVehicle}
+                                    style={{
+                                        cursor: 'pointer',
+                                        pointerEvents: hasCustomer ? 'auto' : 'none',
+                                        opacity: hasCustomer ? 1 : 0.5,
+                                    }}
+                                    onClick={hasCustomer ? HandleReturnVehicle : null}
                                 >
                                     <span>Đồng ý</span>
-                                    <FaCheck className="text-success" />
+                                    <FaCheck
+                                        className={`text-success ${!hasCustomer ? 'disabled' : ''}`}
+                                        style={{
+                                            pointerEvents: hasCustomer ? 'auto' : 'none',
+                                            opacity: hasCustomer ? 1 : 0.5,
+                                            color: hasCustomer ? 'green' : '#ccc',
+                                        }}
+                                    />
                                 </div>
                             </div>
                         )}
