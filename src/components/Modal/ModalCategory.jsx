@@ -17,8 +17,10 @@ const ModalCategory = ({ isShowModal, onClose, token }) => {
     const [filteredCategories, setFilteredCategories] = useState([]);
 
     useEffect(() => {
-        fetchListCategory();
-    }, []);
+        if (isShowModal && listCategory.length === 0) {
+            fetchListCategory();
+        }
+    }, [isShowModal]);
 
     const fetchListCategory = async () => {
         try {
