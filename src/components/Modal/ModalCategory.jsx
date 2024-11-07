@@ -190,7 +190,7 @@ const ModalCategory = ({ isShowModal, onClose, token }) => {
                                 padding: '10px 0',
                             }}
                         >
-                            Thêm mới
+                            Thêm
                         </Button>
                         <Button
                             type="default"
@@ -229,12 +229,23 @@ const ModalCategory = ({ isShowModal, onClose, token }) => {
                                 />
                             </Form.Item>
                             <Form.Item label="Tìm kiếm" style={{ marginTop: '10px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        flexDirection: 'row', // Mặc định trên PC là nằm ngang
+                                        flexWrap: 'wrap', // Để các phần tử không bị tràn ra ngoài
+                                    }}
+                                >
                                     <Input
                                         value={searchAbbreviation}
                                         onChange={(e) => setSearchAbbreviation(e.target.value)}
                                         placeholder="Nhập tên viết tắt để tìm"
-                                        style={{ flex: 1, marginRight: 8 }}
+                                        style={{
+                                            flex: 1,
+                                            marginRight: 8,
+                                            marginBottom: 8,
+                                        }}
                                     />
                                     <Button
                                         type="primary"
@@ -243,6 +254,7 @@ const ModalCategory = ({ isShowModal, onClose, token }) => {
                                             width: '100px',
                                             borderRadius: 5,
                                             padding: '10px 0',
+                                            marginBottom: 8,
                                         }}
                                     >
                                         Tìm
@@ -255,6 +267,7 @@ const ModalCategory = ({ isShowModal, onClose, token }) => {
                                             borderRadius: 5,
                                             padding: '10px 0',
                                             marginLeft: 8,
+                                            marginBottom: 8,
                                         }}
                                     >
                                         Xóa

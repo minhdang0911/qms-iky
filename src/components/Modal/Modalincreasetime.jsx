@@ -3,19 +3,13 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import { FaCheck, FaTimes, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
-const ModalIncreaseTime = ({ isShowModal, onClose, onIncreaseTime }) => {
+const ModalIncreaseTime = ({ isShowModal, onClose, onIncreaseTime, selectedCar }) => {
     const [isOpen, setIsOpen] = useState(true);
 
     const [increaseTime, setIncreaseTime] = useState('');
+    const { _id } = selectedCar;
 
     const toggleOpen = () => setIsOpen((prev) => !prev);
-
-    const handleConfirm = () => {
-        const timeToIncrease = Number(increaseTime) || 0;
-        console.log('Giá trị tăng:', timeToIncrease);
-        onIncreaseTime(timeToIncrease);
-        onClose();
-    };
 
     return (
         <Modal show={isShowModal} onHide={onClose} size="lg">
@@ -47,7 +41,6 @@ const ModalIncreaseTime = ({ isShowModal, onClose, onIncreaseTime }) => {
                                 <div
                                     className="d-flex justify-content-between align-items-center"
                                     style={{ cursor: 'pointer' }}
-                                    onClick={handleConfirm} // Gọi hàm xác nhận
                                 >
                                     <span>Đồng ý</span>
                                     <FaCheck className="text-success" />
@@ -64,7 +57,7 @@ const ModalIncreaseTime = ({ isShowModal, onClose, onIncreaseTime }) => {
                                 <Form.Control
                                     placeholder="Nhập thời gian tăng"
                                     value={increaseTime}
-                                    onChange={(e) => setIncreaseTime(e.target.value)} // Cập nhật giá trị tăng
+                                    onChange={(e) => setIncreaseTime(e.target.value)}
                                     style={{ marginLeft: '10px' }}
                                     type="number"
                                 />

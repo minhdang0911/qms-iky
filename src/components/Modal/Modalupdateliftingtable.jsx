@@ -29,9 +29,9 @@ const ModalUpdateLiftingTable = ({ isShowModal, onClose, selectedCar, onUpdateCa
     useEffect(() => {
         if (selectedCar && technicians.length > 0) {
             setLiftingTable(selectedCar.name);
-            const technicianFound = technicians.find((tech) => tech.name === selectedCar.technician);
+            const technicianFound = technicians?.find((tech) => tech?.name === selectedCar?.technician);
             setTechnicianId(technicianFound ? technicianFound._id : technicians[0]?._id || '');
-            setDescription(selectedCar.customers.description || '');
+            setDescription(selectedCar?.customers?.description || '');
         }
     }, [selectedCar, technicians]);
 

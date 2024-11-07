@@ -12,6 +12,7 @@
 .btn {
     width: 150px !important;
 }
+
 .header {
     display: flex;
     justify-content: space-between;
@@ -201,7 +202,20 @@
     border-radius: 10px;
     overflow: hidden;
     width: 100%;
+    max-height: 400px; /* Max height cho bảng */
+    overflow-y: auto; /* Đảm bảo nội dung thừa sẽ có thanh cuộn */
 }
+
+.active-table-service {
+    transition: height 0.3s ease; /* Thêm hiệu ứng khi mở đóng accordion */
+    height: auto; /* Đảm bảo rằng chiều cao của bảng này không bị thay đổi */
+}
+
+.active-table-waiting {
+    overflow-x: auto;
+    height: 100%; /* Đảm bảo bảng xe chờ lấy không thay đổi chiều cao */
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -311,8 +325,15 @@ tbody tr:last-child td {
     width: 45% !important;
 }
 @media (max-width: 1200px) {
+    // .background-container {
+    //     // width: 111%;
+    //     width: 120%;
+    // }
+
     .background-container {
-        width: 111%;
+        width: 131%;
+        margin-left: -47px;
+        margin-top: -40px;
     }
 
     .table-create-customer {
@@ -367,13 +388,28 @@ tbody tr:last-child td {
     .text-function {
         font-size: 10px !important;
     }
+
+    .btn-delete-services {
+        width: 60px !important;
+    }
+
+    .btn-edit-services {
+        width: 60px !important;
+    }
 }
 @media (max-width: 1200px) and (max-width: 768px) {
     .header {
         align-items: flex-start;
         margin-bottom: 13px;
-        width: 305px;
-        margin-left: 22px;
+        // width: 305px;
+        // margin-left: 22px;
+        width: 352px;
+        margin-left: -8px;
+    }
+
+    .tabs-info {
+        margin-left: -31px !important;
+        width: 112% !important;
     }
     .welcome-text {
         font-size: 13px;
@@ -412,14 +448,22 @@ tbody tr:last-child td {
     .card-grid {
         justify-content: center;
         align-items: center;
-        width: 98%;
+        // width: 98%;
+        width: 100%;
+        margin-left: -3px;
     }
     .border-table {
         width: 114%;
     }
+    // .row-tables {
+    //     width: 115% !important;
+    //     // margin-left: -12px;
+    //     margin-left: -30px;
+    // }
+
     .row-tables {
-        width: 115% !important;
-        margin-left: -12px;
+        width: 101% !important;
+        margin-left: -3px;
     }
     .text-function {
         font-size: 8px !important;

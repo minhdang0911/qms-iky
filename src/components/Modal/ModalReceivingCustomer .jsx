@@ -42,7 +42,7 @@ const ModalReceivingCustomer = ({ isShowModal, onClose, queueId, onCustomer, onU
         };
 
         fetchRepairlist();
-    }, [queueId]); // Đảm bảo gọi lại khi queueId thay đổi
+    }, [queueId]);
 
     useEffect(() => {
         const token = Cookies.get('Access token');
@@ -109,15 +109,16 @@ const ModalReceivingCustomer = ({ isShowModal, onClose, queueId, onCustomer, onU
             toast.error('Lỗi khi tiếp nhận phương tiện: ' + error.message);
         }
     };
+
     return (
         <>
-            <Modal show={isShowModal} onHide={onClose} size="xl">
+            <Modal show={isShowModal} onHide={onClose} size="xl" dialogClassName="modal-90w">
                 <Modal.Header closeButton>
                     <Modal.Title>Tiếp nhận khách</Modal.Title>
                 </Modal.Header>
 
                 <Modal.Body>
-                    <div className="d-flex">
+                    <div className="d-flex flex-column flex-md-row">
                         <div className="flex-shrink-0" style={{ flexBasis: '30%' }}>
                             <div
                                 className="d-flex justify-content-between align-items-center"
@@ -259,22 +260,13 @@ const ModalReceivingCustomer = ({ isShowModal, onClose, queueId, onCustomer, onU
                         </div>
                     </div>
                 </Modal.Body>
-
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={onClose}>
-                        Đóng
-                    </Button>
-                    <Button variant="primary">Lưu</Button>
-                </Modal.Footer>
             </Modal>
 
             <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Xác nhận xóa</Modal.Title>
+                    <Modal.Title>Xác nhận xóa dịch vụ</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
-                    <p>Bạn có chắc chắn muốn xóa dịch vụ này không?</p>
-                </Modal.Body>
+                <Modal.Body>Bạn có chắc chắn muốn xóa dịch vụ này không?</Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowConfirm(false)}>
                         Hủy

@@ -7,65 +7,21 @@ import { FaPlus, FaEdit, FaSave, FaTrash } from 'react-icons/fa';
 import { Container, Row, Col } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
-import { apiCreateServies, apiGetServies, apiDeleteServies } from '../apis/service';
+import { apiCreateServies, apiGetServies, apiDeleteServies, apiUpdateServies } from '../apis/service';
 
 const ModalServices = ({ isShowModal, onClose, token, onCustomer }) => {
     const [name, setName] = useState('');
     const [time, setTime] = useState('');
     const [serialNumberStart, setSerialNumberStart] = useState('');
     const [showConfirm, setShowConfirm] = useState(false);
-    const [dataCategory, setDataCategory] = useState([]);
-    const [selectedIndex, setSelectedIndex] = useState(null);
-    const [searchAbbreviation, setSearchAbbreviation] = useState('');
-    const [filteredCategories, setFilteredCategories] = useState([]);
     const [listServies, setListServices] = useState([]);
+    const [selectedIndex, setSelectedIndex] = useState(null);
     const [selectedIdToDelete, setSelectedIdToDelete] = useState(null);
-
-    useEffect(() => {
-        setFilteredCategories(dataCategory);
-    }, [dataCategory]);
-
-    const resetForm = () => {
-        setName('');
-        setTime('');
-        setSerialNumberStart(''); // Reset serial number
-        setSelectedIndex(null);
-        setSearchAbbreviation('');
-    };
-
-    const handleSave = async () => {
-        try {
-            const token = Cookies.get('Access token');
-            const response = await apiCreateServies(token, name, time, serialNumberStart); // Thêm serialNumberStart
-            if (response && response.result === 1) {
-                toast.success('Dịch vụ đã được tạo thành công!');
-                onCustomer();
-                setListServices((prevList) => [
-                    ...prevList,
-                    { name: name, time: parseInt(time), serial_number_start: serialNumberStart }, // Lưu serial number mới
-                ]);
-                resetForm();
-            } else {
-                toast.error('Không thể tạo dịch vụ, vui lòng thử lại.');
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error('Đã xảy ra lỗi khi tạo dịch vụ.');
-        }
-    };
-
-    const handleRowClick = (index) => {
-        const selectedItem = filteredCategories[index];
-        setSelectedIndex(dataCategory.indexOf(selectedItem));
-        setName(selectedItem.name);
-        setTime(selectedItem.time);
-    };
 
     useEffect(() => {
         const token = Cookies.get('Access token');
         const fetchListServies = async () => {
             try {
-                const token = Cookies.get('Access token');
                 if (!token) {
                     return;
                 }
@@ -83,6 +39,66 @@ const ModalServices = ({ isShowModal, onClose, token, onCustomer }) => {
         };
         fetchListServies();
     }, []);
+
+    const resetForm = () => {
+        setName('');
+        setTime('');
+        setSerialNumberStart('');
+        setSelectedIndex(null);
+    };
+
+    const handleSave = async () => {
+        const token = Cookies.get('Access token');
+        try {
+            if (selectedIndex === null) {
+                // Thêm mới dịch vụ
+                const response = await apiCreateServies(token, name, time, serialNumberStart);
+                if (response && response.result === 1) {
+                    toast.success('Dịch vụ đã được tạo thành công!');
+                    onCustomer();
+                    setListServices((prevList) => [
+                        ...prevList,
+                        { name, time: parseInt(time), serial_number_start: serialNumberStart },
+                    ]);
+                    resetForm();
+                } else {
+                    toast.error('Không thể tạo dịch vụ, vui lòng thử lại.');
+                }
+            } else {
+                // Sửa dịch vụ
+                const serviceId = listServies[selectedIndex]._id;
+                const response = await apiUpdateServies(token, name, serialNumberStart, serviceId);
+                if (response && response.result === 1) {
+                    toast.success('Dịch vụ đã được sửa thành công!');
+                    onCustomer();
+                    setListServices((prevList) => {
+                        const updatedList = [...prevList];
+                        updatedList[selectedIndex] = {
+                            ...updatedList[selectedIndex],
+                            name,
+                            time: parseInt(time),
+                            serial_number_start: serialNumberStart,
+                        };
+                        return updatedList;
+                    });
+                    resetForm();
+                } else {
+                    toast.error('Không thể sửa dịch vụ, vui lòng thử lại.');
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error('Đã xảy ra lỗi khi thao tác với dịch vụ.');
+        }
+    };
+
+    const handleRowClick = (index) => {
+        const selectedItem = listServies[index];
+        setSelectedIndex(index);
+        setName(selectedItem.name);
+        setTime(selectedItem.time);
+        setSerialNumberStart(selectedItem.serial_number_start);
+    };
 
     const handleDelete = async (id) => {
         try {
@@ -107,31 +123,18 @@ const ModalServices = ({ isShowModal, onClose, token, onCustomer }) => {
         <>
             <Modal show={isShowModal} onHide={onClose} size="xl">
                 <Modal.Header closeButton>
-                    <Modal.Title>Khai báo dịch vụ</Modal.Title>
+                    <Modal.Title>{selectedIndex === null ? 'Khai báo dịch vụ' : 'Chỉnh sửa dịch vụ'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Container fluid>
                         <Row>
                             <Col xs={12} md={4} className="mb-3">
                                 <div className="d-flex flex-column">
-                                    <Button variant="primary" className="mb-2" onClick={resetForm}>
+                                    <Button variant="primary" className="mb-2" onClick={resetForm} size="sm">
                                         <FaPlus /> Thêm mới
                                     </Button>
-                                    <Button
-                                        variant="warning"
-                                        className="mb-2"
-                                        onClick={() => {
-                                            if (selectedIndex !== null) {
-                                                const selectedItem = filteredCategories[selectedIndex];
-                                                setName(selectedItem.name);
-                                                setTime(selectedItem.time);
-                                                setSerialNumberStart(selectedItem.serial_number_start || '');
-                                            }
-                                        }}
-                                    >
-                                        <FaEdit /> Sửa
-                                    </Button>
-                                    <Button variant="success" onClick={handleSave}>
+
+                                    <Button variant="success" onClick={handleSave} size="sm">
                                         <FaSave /> Lưu
                                     </Button>
                                 </div>
@@ -167,32 +170,48 @@ const ModalServices = ({ isShowModal, onClose, token, onCustomer }) => {
                                         />
                                     </Form.Group>
                                 </Form>
-                                <div className="table-category-responsive">
-                                    <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                                        <Table striped bordered hover responsive>
-                                            <thead>
-                                                <tr>
-                                                    <th>Tên</th>
-                                                    <th>Xóa</th>
+                                <div
+                                    className="table-category-responsive"
+                                    style={{
+                                        maxHeight: '400px',
+                                        overflowY: 'auto',
+                                        overflowX: 'auto',
+                                    }}
+                                >
+                                    <Table striped bordered hover responsive>
+                                        <thead>
+                                            <tr>
+                                                <th>Tên</th>
+                                                <th>Hành động</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {listServies?.map((items, index) => (
+                                                <tr key={index} onClick={() => handleRowClick(index)}>
+                                                    <td>{items?.name}</td>
+                                                    <td>
+                                                        <Button
+                                                            variant="danger"
+                                                            onClick={() => handleShowConfirm(items._id)}
+                                                            size="sm"
+                                                            className="btn-delete-services"
+                                                        >
+                                                            <FaTrash />
+                                                        </Button>
+                                                        <Button
+                                                            style={{ marginLeft: '5px' }}
+                                                            variant="warning"
+                                                            onClick={() => handleRowClick(index)}
+                                                            size="sm"
+                                                            className="btn-edit-services"
+                                                        >
+                                                            <FaEdit /> Sửa
+                                                        </Button>
+                                                    </td>
                                                 </tr>
-                                            </thead>
-                                            <tbody>
-                                                {listServies?.map((items, index) => (
-                                                    <tr key={index}>
-                                                        <td>{items?.name}</td>
-                                                        <td>
-                                                            <Button
-                                                                variant="danger"
-                                                                onClick={() => handleShowConfirm(items._id)}
-                                                            >
-                                                                <FaTrash />
-                                                            </Button>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </Table>
-                                    </div>
+                                            ))}
+                                        </tbody>
+                                    </Table>
                                 </div>
                             </Col>
                         </Row>
@@ -206,10 +225,10 @@ const ModalServices = ({ isShowModal, onClose, token, onCustomer }) => {
                 </Modal.Header>
                 <Modal.Body>Bạn có chắc chắn muốn xóa mục này?</Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowConfirm(false)}>
+                    <Button variant="secondary" onClick={() => setShowConfirm(false)} size="sm">
                         Hủy
                     </Button>
-                    <Button variant="danger" onClick={() => handleDelete(selectedIdToDelete)}>
+                    <Button variant="danger" onClick={() => handleDelete(selectedIdToDelete)} size="sm">
                         Xóa
                     </Button>
                 </Modal.Footer>

@@ -168,7 +168,6 @@ const Dashboard = () => {
     useEffect(() => {
         const token1 = Cookies.get('Access token');
         if (!token1) {
-            // Hiển thị thông báo nếu không có token
             Swal.fire({
                 icon: 'error',
                 title: 'Phiên bản hết hạn!',
@@ -213,10 +212,6 @@ const Dashboard = () => {
         setReceivedCustomers((prevCustomers) => [...prevCustomers, { customer, ID, licensePlate, time }]);
     };
 
-    const handleCustomerReturn = (index) => {
-        setReceivedCustomers((prevCustomers) => prevCustomers.filter((_, i) => i !== index));
-    };
-
     const handleToggleModal = (modalKey, queueId = null) => {
         toggleModal(modalKey);
         if (queueId) {
@@ -254,18 +249,6 @@ const Dashboard = () => {
     useEffect(() => {
         fetchCustomer();
     }, []);
-
-    const setSelectedCarRoww = (carId) => {
-        const index = cars.findIndex((car) => car._id === carId);
-        setSelectedIndex(index);
-    };
-
-    const toggleRow = (index) => {
-        setExpandedRows((prev) => ({
-            ...prev,
-            [index]: !prev[index], // Đảo trạng thái mở/đóng của hàng
-        }));
-    };
 
     //api danh sách lấy số
     const toggleService = (index) => {
@@ -440,7 +423,7 @@ const Dashboard = () => {
 
     //loa đọc thông báo
     const readAloud = (item) => {
-        const message = `${item.name} số thứ tự ${item.serial_number} biển số xe ${item.license_plate} vui lòng đến lấy xe.`;
+        const message = `Khách hàng${item.name} số thứ tự ${item.serial_number} biển số xe ${item.license_plate} vui lòng đến lấy xe.`;
 
         if ('speechSynthesis' in window) {
             const utterance = new SpeechSynthesisUtterance(message);
@@ -533,7 +516,7 @@ const Dashboard = () => {
                             )}
                         </div>
                     </header>
-                    <div>
+                    <div className="tabs-info">
                         <Tabs
                             activeKey={activeKey}
                             onChange={setActiveKey}
@@ -541,8 +524,32 @@ const Dashboard = () => {
                         >
                             <TabPane tab="Trang Chính" key="home">
                                 <div className="card-grid">
-                                    {/* Card content for "Trang Chính" */}
-                                    <div className="card">
+                                    <div
+                                        className="card"
+                                        style={{
+                                            position: 'relative',
+                                            padding: '1rem',
+                                            border: '1px solid #ccc',
+                                            borderRadius: '8px',
+                                        }}
+                                    >
+                                        <legend
+                                            className="function-legend"
+                                            style={{
+                                                fontSize: '1rem',
+                                                fontWeight: 'bold',
+                                                position: 'absolute',
+                                                top: '-0.8rem',
+                                                left: '-0.5rem',
+                                                padding: '0 0.5rem',
+                                                width: 'auto',
+                                                background: '#fff',
+                                                zIndex: 1,
+                                            }}
+                                        >
+                                            Bảng nâng
+                                        </legend>
+
                                         <div className="cart-top">
                                             <div
                                                 className="cart-center"
@@ -574,12 +581,34 @@ const Dashboard = () => {
                                                 <p className="text-function">Đồng bộ bảng leb</p>
                                             </div>
                                         </div>
-                                        <p className="function">Bảng nâng</p>
                                     </div>
 
-                                    {/* Other cards for "Trang Chính" */}
-                                    {/* Repeat similar structure for other cards */}
-                                    <div className="card">
+                                    <div
+                                        className="card"
+                                        style={{
+                                            position: 'relative',
+                                            padding: '1rem',
+                                            border: '1px solid #ccc',
+                                            borderRadius: '8px',
+                                        }}
+                                    >
+                                        <legend
+                                            className="function-legend"
+                                            style={{
+                                                fontSize: '1rem',
+                                                fontWeight: 'bold',
+                                                position: 'absolute',
+                                                top: '-0.8rem',
+                                                left: '-0.5rem',
+                                                padding: '0 0.5rem',
+                                                width: 'auto',
+                                                background: '#fff',
+                                                zIndex: 1,
+                                            }}
+                                        >
+                                            Thông tin sửa chữa
+                                        </legend>
+
                                         <div className="cart-top">
                                             <div className="cart-center">
                                                 <TiSpanner className="icon-plus" size={30} />
@@ -607,10 +636,34 @@ const Dashboard = () => {
                                                 <p className="text-function">Trả xe</p>
                                             </div>
                                         </div>
-                                        <p className="function">Thông tin sửa chữa</p>
                                     </div>
 
-                                    <div className="card ">
+                                    <div
+                                        className="card"
+                                        style={{
+                                            position: 'relative',
+                                            padding: '1rem',
+                                            border: '1px solid #ccc',
+                                            borderRadius: '8px',
+                                        }}
+                                    >
+                                        <legend
+                                            className="function-legend"
+                                            style={{
+                                                fontSize: '1rem',
+                                                fontWeight: 'bold',
+                                                position: 'absolute',
+                                                top: '-0.8rem',
+                                                left: '-0.5rem',
+                                                padding: '0 0.5rem',
+                                                width: 'auto',
+                                                background: '#fff',
+                                                zIndex: 1,
+                                            }}
+                                        >
+                                            Thông tin khách hàng
+                                        </legend>
+
                                         <div className="cart-top">
                                             <div
                                                 className="cart-center"
@@ -639,20 +692,68 @@ const Dashboard = () => {
                                                 <p className="text-function"> Tắt thông báo</p>
                                             </div>
                                         </div>
-                                        <p className="function">Thông tin khách hàng</p>
                                     </div>
 
-                                    <div className="card">
+                                    <div
+                                        className="card"
+                                        style={{
+                                            position: 'relative',
+                                            padding: '1rem',
+                                            border: '1px solid #ccc',
+                                            borderRadius: '8px',
+                                        }}
+                                    >
+                                        <legend
+                                            className="function-legend"
+                                            style={{
+                                                fontSize: '1rem',
+                                                fontWeight: 'bold',
+                                                position: 'absolute',
+                                                top: '-0.8rem',
+                                                left: '-0.5rem',
+                                                padding: '0 0.5rem',
+                                                width: 'auto',
+                                                background: '#fff',
+                                                zIndex: 1,
+                                            }}
+                                        >
+                                            Báo cáo
+                                        </legend>
+
                                         <div className="cart-top">
                                             <div className="cart-center">
                                                 <GrPrint size={30} />
                                                 <p className="text-function">Xuất báo cáo</p>
                                             </div>
                                         </div>
-                                        <p className="function">Báo cáo</p>
                                     </div>
 
-                                    <div className="card">
+                                    <div
+                                        className="card"
+                                        style={{
+                                            position: 'relative',
+                                            padding: '1rem',
+                                            border: '1px solid #ccc',
+                                            borderRadius: '8px',
+                                        }}
+                                    >
+                                        <legend
+                                            className="function-legend"
+                                            style={{
+                                                fontSize: '1rem',
+                                                fontWeight: 'bold',
+                                                position: 'absolute',
+                                                top: '-0.8rem',
+                                                left: '-0.5rem',
+                                                padding: '0 0.5rem',
+                                                width: 'auto',
+                                                background: '#fff',
+                                                zIndex: 1,
+                                            }}
+                                        >
+                                            Khai báo
+                                        </legend>
+
                                         <div className="cart-top">
                                             <div
                                                 className="cart-center"
@@ -680,14 +781,38 @@ const Dashboard = () => {
                                                 <p className="text-function">thuật viên</p>
                                             </div>
                                         </div>
-                                        <p className="function">Khai báo</p>
                                     </div>
                                 </div>
                             </TabPane>
 
                             <TabPane tab="Cấu Hình" key="settings">
                                 <div className="card-grid">
-                                    <div className="card">
+                                    <div
+                                        className="card"
+                                        style={{
+                                            position: 'relative',
+                                            padding: '1rem',
+                                            border: '1px solid #ccc',
+                                            borderRadius: '8px',
+                                        }}
+                                    >
+                                        <legend
+                                            className="function-legend"
+                                            style={{
+                                                fontSize: '1rem',
+                                                fontWeight: 'bold',
+                                                position: 'absolute',
+                                                top: '-0.8rem',
+                                                left: '-0.5rem',
+                                                padding: '0 0.5rem',
+                                                width: 'auto',
+                                                background: '#fff',
+                                                zIndex: 1,
+                                            }}
+                                        >
+                                            Thông tin
+                                        </legend>
+
                                         <Row justify="center">
                                             <Col span={24}>
                                                 <div className="cart-top">
@@ -743,14 +868,38 @@ const Dashboard = () => {
                                                 </div>
                                             </Col>
                                         </Row>
-                                        <p className="function">Thông tin</p>
                                     </div>
                                 </div>
                             </TabPane>
 
                             <TabPane tab="Import" key="import">
                                 <div className="card-grid">
-                                    <div className="card">
+                                    <div
+                                        className="card"
+                                        style={{
+                                            position: 'relative',
+                                            padding: '1rem',
+                                            border: '1px solid #ccc',
+                                            borderRadius: '8px',
+                                        }}
+                                    >
+                                        <legend
+                                            className="function-legend"
+                                            style={{
+                                                fontSize: '1rem',
+                                                fontWeight: 'bold',
+                                                position: 'absolute',
+                                                top: '-0.8rem',
+                                                left: '-0.5rem',
+                                                padding: '0 0.5rem',
+                                                width: 'auto',
+                                                background: '#fff',
+                                                zIndex: 1,
+                                            }}
+                                        >
+                                            Import
+                                        </legend>
+
                                         <Row justify="center">
                                             <Col span={24}>
                                                 <div className="cart-top">
@@ -781,14 +930,38 @@ const Dashboard = () => {
                                                 </div>
                                             </Col>
                                         </Row>
-                                        <p className="function">Import</p>
                                     </div>
                                 </div>
                             </TabPane>
 
                             <TabPane tab="Trợ Giúp" key="help">
                                 <div className="card-grid">
-                                    <div className="card">
+                                    <div
+                                        className="card"
+                                        style={{
+                                            position: 'relative',
+                                            padding: '1rem',
+                                            border: '1px solid #ccc',
+                                            borderRadius: '8px',
+                                        }}
+                                    >
+                                        <legend
+                                            className="function-legend"
+                                            style={{
+                                                fontSize: '1rem',
+                                                fontWeight: 'bold',
+                                                position: 'absolute',
+                                                top: '-0.8rem',
+                                                left: '-0.5rem',
+                                                padding: '0 0.5rem',
+                                                width: 'auto',
+                                                background: '#fff',
+                                                zIndex: 1,
+                                            }}
+                                        >
+                                            Thông tin
+                                        </legend>
+
                                         <Row justify="center">
                                             <Col span={24}>
                                                 <div className="cart-top">
@@ -830,7 +1003,6 @@ const Dashboard = () => {
                                                 </div>
                                             </Col>
                                         </Row>
-                                        <p className="function">Thông tin</p>
                                     </div>
                                 </div>
                             </TabPane>
@@ -1252,7 +1424,7 @@ const Dashboard = () => {
                                     </div>
                                     <div className="row-tables">
                                         {/* api thực tế */}
-                                        <div className="active-table">
+                                        <div className="active-table active-table-service">
                                             <h4 className="active-table-title">DANH SÁCH DỊCH VỤ</h4>
 
                                             <Accordion>
@@ -1363,7 +1535,10 @@ const Dashboard = () => {
                                                 ))}
                                             </Accordion>
                                         </div>
-                                        <div className="active-table" style={{ overflowX: 'auto' }}>
+                                        <div
+                                            className="active-table active-table-waiting"
+                                            style={{ overflowX: 'auto' }}
+                                        >
                                             <p
                                                 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '8px' }}
                                                 className="active-table-title"
