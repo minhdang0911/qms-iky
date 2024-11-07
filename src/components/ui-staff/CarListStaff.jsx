@@ -232,7 +232,7 @@ const Dashboard = () => {
     const fetchCustomer = async () => {
         const token = Cookies.get('Access token');
         try {
-            const response = await fetch('/api/customers/queue-list', {
+            const response = await fetch('https://qms-admin.iky.vn/api/customers/queue-list', {
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${token}`,
