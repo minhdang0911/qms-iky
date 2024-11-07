@@ -9,12 +9,10 @@ import { toast } from 'react-toastify';
 const ModalReturnCar = ({ isShowModal, onClose, selectedCar, onDelete, onFinishCars }) => {
     const [isOpen, setIsOpen] = useState(true);
 
-    const toggleOpen = () => {
-        setIsOpen((prev) => !prev);
-    };
+    const toggleOpen = () => setIsOpen((prev) => !prev);
 
     // Kiểm tra sự tồn tại của customers trong selectedCar
-    const hasCustomer = selectedCar && selectedCar.customers && Object.keys(selectedCar.customers).length > 0;
+    const hasCustomer = selectedCar && selectedCar?.customers && Object.keys(selectedCar?.customers).length > 0;
 
     const { _id } = selectedCar;
     const token = Cookies.get('Access token');

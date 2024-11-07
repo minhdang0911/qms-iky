@@ -331,9 +331,9 @@ tbody tr:last-child td {
     // }
 
     .background-container {
-        width: 131%;
-        margin-left: -47px;
-        margin-top: -40px;
+        width: 107%;
+        margin-left: -15px;
+        margin-top: -17px;
     }
 
     .table-create-customer {
@@ -352,8 +352,16 @@ tbody tr:last-child td {
         margin-left: 2px;
     }
     .header {
-        width: 955px;
+        width: 833px;
     }
+
+    .tabs-info {
+        width: 832px;
+        /* background-color: red; */
+        margin-top: 10px;
+        /* margin-left: 22px; */
+    }
+
     .card {
         width: calc(33.33% - 20px);
         /* Điều chỉnh width cho màn hình lớn hơn tablet */
@@ -369,10 +377,14 @@ tbody tr:last-child td {
         width: 110%;
     }
     .row-tables {
-        width: 110% !important;
+        width: 100% !important;
+    }
+
+    .card {
+        width: 99% !important;
     }
     .card-grid {
-        width: 108%;
+        width: 104%;
     }
     .cart-center {
         display: flex;
@@ -445,12 +457,18 @@ tbody tr:last-child td {
         /* Full width cho thiết bị di động */
         margin-bottom: 15px;
     }
+
+    .background-container {
+        width: 133%;
+        margin-left: -48px;
+        margin-top: -17px;
+    }
+
     .card-grid {
         justify-content: center;
         align-items: center;
-        // width: 98%;
-        width: 100%;
-        margin-left: -3px;
+        width: 102%;
+        margin-left: -5px;
     }
     .border-table {
         width: 114%;
