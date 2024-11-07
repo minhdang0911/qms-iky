@@ -74,6 +74,7 @@ const Dashboard = () => {
     const acessToken = Cookies.get('Access token');
     const [serviceWaiting, setServiceWaiting] = useState([]);
     const [serialData, setSerialData] = useState(null);
+    const [status, setStatus] = useState('Chưa bắt đầu đọc.');
 
     const modals = [
         { key: 'isShowModalCreateLiftingTable', component: Modalcreateliftingtable },
@@ -437,6 +438,37 @@ const Dashboard = () => {
         setIsModalSerial(false);
     };
 
+    //loa đọc thông báo
+    const readAloud = (item) => {
+        const message = `${item.name} số thứ tự ${item.serial_number} biển số xe ${item.license_plate} vui lòng đến lấy xe.`;
+
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(message);
+
+            // Khi bắt đầu đọc
+            utterance.onstart = () => {
+                console.log('Đang bắt đầu đọc: ', message);
+                setStatus('Đang đọc: ' + message);
+            };
+
+            // Khi đọc xong
+            utterance.onend = () => {
+                console.log('Đã đọc xong.');
+                setStatus('Đã đọc xong.');
+            };
+
+            // Nếu có lỗi khi đọc
+            utterance.onerror = (event) => {
+                console.error('Lỗi khi đọc:', event.error);
+                setStatus('Có lỗi xảy ra khi đọc.');
+            };
+
+            // Bắt đầu đọc
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert('Tính năng đọc văn bản không được hỗ trợ trên trình duyệt này.');
+        }
+    };
     return (
         <>
             {token ? (
@@ -485,14 +517,14 @@ const Dashboard = () => {
 
                             {token ? (
                                 <>
-                                    <Button
+                                    {/* <Button
                                         color="danger"
                                         variant="solid"
                                         onClick={showModal}
                                         style={{ marginRight: '10px' }}
                                     >
                                         Bốc số thứ tự
-                                    </Button>
+                                    </Button> */}
 
                                     <FiLogOut onClick={handleLogout} className="icon logout-icon" title="Đăng xuất" />
                                 </>
@@ -1413,7 +1445,10 @@ const Dashboard = () => {
                                                                 </span>
                                                             </td>
 
-                                                            <td className="status-cell">
+                                                            <td
+                                                                className="status-cell"
+                                                                onClick={() => readAloud(items)}
+                                                            >
                                                                 <span className="status status-call">📢</span>
                                                             </td>
                                                         </tr>
