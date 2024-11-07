@@ -11,6 +11,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ResetPasswordForm from './components/Login/forgotPassword';
 import GetSerialNumber from './components/serial/GetSerialNumber';
+import { Analytics } from '@vercel/analytics/react';
 
 function App() {
     return (
