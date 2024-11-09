@@ -104,3 +104,41 @@ export const apiDeleteQueue = async (token, id) => {
     }
     return await response.json(); // Trả về kết quả từ response
 };
+
+export const apiIncreaseTime = async (token, id, time) => {
+    const params = new URLSearchParams();
+    params.append('id', id);
+    params.append('time', time);
+    const response = await fetch('https://qms-admin.iky.vn/api/customers/increase-repair-time', {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params.toString(),
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to delete repair category');
+    }
+    return await response.json();
+};
+
+export const apiDecreaseTime = async (token, id, time) => {
+    const params = new URLSearchParams();
+    params.append('id', id);
+    params.append('time', time);
+    const response = await fetch('https://qms-admin.iky.vn/api/customers/decrease-repair-time', {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params.toString(),
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to delete repair category');
+    }
+    return await response.json();
+};

@@ -8,7 +8,7 @@ import { apiGetTechnical } from '../apis/technical';
 import { apiCreateLiftTable } from '../apis/liftTable';
 import Cookies from 'js-cookie';
 
-const ModalCreateLiftingTable = ({ isShowModal, onClose, onAddCars }) => {
+const ModalCreateLiftingTable = ({ isShowModal, onClose, onUpdateCars }) => {
     const [liftingTable, setLiftingTable] = useState('');
     const [description, setDescription] = useState('');
     const [technician, setTechnician] = useState('');
@@ -48,7 +48,8 @@ const ModalCreateLiftingTable = ({ isShowModal, onClose, onAddCars }) => {
             if (response) {
                 toast.success('Tạo bàn nâng thành công');
                 resetForm();
-                onClose(); // Close modal after save
+                onUpdateCars();
+                onClose();
             }
         } catch (error) {
             toast.error('Tạo bàn nâng thất bại');

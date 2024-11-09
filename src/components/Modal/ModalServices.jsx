@@ -51,8 +51,13 @@ const ModalServices = ({ isShowModal, onClose, token, onCustomer }) => {
         const token = Cookies.get('Access token');
         try {
             if (selectedIndex === null) {
+                if (!name || !time || !serialNumberStart) {
+                    toast.error('Vui lòng nhập đầy đủ thông tin');
+                    return;
+                }
                 // Thêm mới dịch vụ
                 const response = await apiCreateServies(token, name, time, serialNumberStart);
+
                 if (response && response.result === 1) {
                     toast.success('Dịch vụ đã được tạo thành công!');
                     onCustomer();

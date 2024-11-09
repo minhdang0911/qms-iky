@@ -2,24 +2,53 @@ import React, { useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import { FaCheck, FaTimes, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { apiDecreaseTime, apiIncreaseTime } from '../apis/customer';
+import { notification } from 'antd';
+import Cookies from 'js-cookie';
 
-const ModalDecreaseTime = ({ isShowModal, onClose, onDecreaseTime }) => {
+const ModalDecreaseTime = ({ isShowModal, onClose, selectedCar, onUpdateCars }) => {
     const [isOpen, setIsOpen] = useState(true);
-    const [decreaseTime, setDecreaseTime] = useState('');
+    const [increaseTime, setIncreaseTime] = useState('');
 
+    // Toggle open/close
     const toggleOpen = () => setIsOpen((prev) => !prev);
 
-    const handleConfirm = () => {
-        const timeToDecrease = Number(decreaseTime); // Chuyển đổi thành số
-        console.log('Giá trị giảm:', timeToDecrease); // Kiểm tra giá trị
-        onDecreaseTime(timeToDecrease); // Gọi hàm onDecreaseTime
-        onClose(); // Đóng modal
+    // Gọi API để tăng thời gian sửa chữa
+    const handleIncreaseTime = async () => {
+        const token = Cookies.get('Access token');
+        const id = selectedCar.customers._id;
+        const time = increaseTime;
+
+        if (!time) {
+            notification.error({
+                message: 'Lỗi',
+                description: 'Vui lòng nhập thời gian tăng.',
+            });
+            return;
+        }
+
+        try {
+            const response = await apiDecreaseTime(token, id, time);
+            if (response) {
+                notification.success({
+                    message: 'Thành công',
+                    description: `Đã giảm thời gian sửa chữa cho khách hàng ${selectedCar.customers.name}.`,
+                });
+                onUpdateCars();
+                onClose();
+            }
+        } catch (error) {
+            notification.error({
+                message: 'Lỗi',
+                description: 'Không thể tăng thời gian sửa chữa.',
+            });
+        }
     };
 
     return (
         <Modal show={isShowModal} onHide={onClose} size="lg">
             <Modal.Header closeButton>
-                <Modal.Title>Chỉnh thời gian</Modal.Title>
+                <Modal.Title>Chỉnh thời gian sửa chữa</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <div className="d-flex">
@@ -29,7 +58,7 @@ const ModalDecreaseTime = ({ isShowModal, onClose, onDecreaseTime }) => {
                             onClick={toggleOpen}
                             style={{ cursor: 'pointer' }}
                         >
-                            <span>Chức năng</span>
+                            <span className="fw-semibold">Chức năng</span>
                             {isOpen ? <FaChevronUp /> : <FaChevronDown />}
                         </div>
                         <hr />
@@ -44,9 +73,11 @@ const ModalDecreaseTime = ({ isShowModal, onClose, onDecreaseTime }) => {
                                     <FaTimes className="text-danger" />
                                 </div>
                                 <div
-                                    className="d-flex justify-content-between align-items-center"
-                                    style={{ cursor: 'pointer' }}
-                                    onClick={handleConfirm} // Gọi hàm xác nhận
+                                    className={`d-flex justify-content-between align-items-center ${
+                                        increaseTime ? '' : 'opacity-50'
+                                    }`}
+                                    style={{ cursor: increaseTime ? 'pointer' : 'not-allowed' }}
+                                    onClick={increaseTime ? handleIncreaseTime : null}
                                 >
                                     <span>Đồng ý</span>
                                     <FaCheck className="text-success" />
@@ -56,16 +87,19 @@ const ModalDecreaseTime = ({ isShowModal, onClose, onDecreaseTime }) => {
                     </div>
 
                     <div className="flex-grow-1 ps-4">
-                        <h5>Thông tin</h5>
+                        <h5 className="fw-bold text-secondary mb-3">Thông tin</h5>
                         <Form>
-                            <Form.Group className="mb-3 d-flex">
-                                <Form.Label style={{ whiteSpace: 'nowrap' }}>Thời gian (phút)</Form.Label>
+                            <Form.Group className="mb-3 d-flex align-items-center">
+                                <Form.Label className="me-3" style={{ whiteSpace: 'nowrap' }}>
+                                    Thời gian (phút)
+                                </Form.Label>
                                 <Form.Control
-                                    placeholder="Nhập thời gian giảm"
-                                    value={decreaseTime}
-                                    onChange={(e) => setDecreaseTime(e.target.value)} // Cập nhật giá trị giảm
-                                    style={{ marginLeft: '10px' }}
+                                    placeholder="Nhập thời gian tăng"
+                                    value={increaseTime}
+                                    onChange={(e) => setIncreaseTime(e.target.value)}
                                     type="number"
+                                    className="rounded"
+                                    style={{ flex: 1, padding: '10px' }}
                                 />
                             </Form.Group>
                         </Form>

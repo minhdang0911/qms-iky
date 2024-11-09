@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 import moment from 'moment';
 import { apiCreateReceptionVehicle, apiGetLiftTable } from '../apis/liftTable';
 import { apiGetCategory } from '../apis/category';
-import { apiAddCustomerCategory, apiGetRepairList, apiDeleteRepairCategory } from '../apis/customer'; // Import thêm apiDeleteRepairCategory
+import { apiAddCustomerCategory, apiGetRepairList, apiDeleteRepairCategory } from '../apis/customer';
 import Cookies from 'js-cookie';
 
 const ModalReceivingCustomer = ({ isShowModal, onClose, queueId, onCustomer, onUpdateCars }) => {
@@ -23,6 +23,7 @@ const ModalReceivingCustomer = ({ isShowModal, onClose, queueId, onCustomer, onU
     const [name, setName] = useState('');
     const [licensePlate, setlicensePlate] = useState('');
     const [selectedLiftTable, setSelectedLiftTable] = useState('');
+    const [isFormValid, setIsFormValid] = useState(false);
 
     useEffect(() => {
         const token = Cookies.get('Access token');
@@ -54,6 +55,11 @@ const ModalReceivingCustomer = ({ isShowModal, onClose, queueId, onCustomer, onU
         fetchCategory();
     }, []);
 
+    useEffect(() => {
+        // Kiểm tra nếu tất cả các trường bắt buộc đã có giá trị
+        setIsFormValid(name.trim() !== '' && licensePlate.trim() !== '' && selectedLiftTable !== '');
+    }, [name, licensePlate, selectedLiftTable]);
+
     const handleAddCategory = async () => {
         const token = Cookies.get('Access token');
 
@@ -66,11 +72,8 @@ const ModalReceivingCustomer = ({ isShowModal, onClose, queueId, onCustomer, onU
             await apiAddCustomerCategory(token, queueId, selectedService);
             toast.success('Đã thêm danh mục sửa chữa cho khách hàng!');
 
-            // Gọi lại danh sách dịch vụ sau khi thêm
             const response = await apiGetRepairList(token, queueId);
             setListRepair(response?.msg);
-
-            // Xóa chọn dịch vụ sau khi thêm thành công
             setSelectedService('');
         } catch (error) {
             toast.error('Lỗi khi thêm danh mục: ' + error.message);
@@ -85,7 +88,6 @@ const ModalReceivingCustomer = ({ isShowModal, onClose, queueId, onCustomer, onU
             try {
                 await apiDeleteRepairCategory(token, queueId, repairItem._id);
                 toast.success('Xóa dịch vụ thành công!');
-                // Cập nhật lại danh sách sau khi xóa
                 setListRepair((prev) => prev.filter((_, index) => index !== selectedIndex));
             } catch (error) {
                 toast.error('Lỗi khi xóa dịch vụ: ' + error.message);
@@ -139,12 +141,14 @@ const ModalReceivingCustomer = ({ isShowModal, onClose, queueId, onCustomer, onU
                                         <FaTimes className="text-danger" />
                                     </div>
                                     <div
-                                        onClick={handleAccept}
-                                        className="d-flex justify-content-between align-items-center"
-                                        style={{ cursor: 'pointer' }}
+                                        onClick={isFormValid ? handleAccept : null}
+                                        className={`d-flex justify-content-between align-items-center ${
+                                            !isFormValid ? 'text-muted' : ''
+                                        }`}
+                                        style={{ cursor: isFormValid ? 'pointer' : 'not-allowed' }}
                                     >
                                         <span>Đồng ý</span>
-                                        <FaCheck className="text-success" />
+                                        <FaCheck className={isFormValid ? 'text-success' : ''} />
                                     </div>
                                 </div>
                             )}
@@ -238,19 +242,17 @@ const ModalReceivingCustomer = ({ isShowModal, onClose, queueId, onCustomer, onU
                                     <tbody>
                                         {listRepair?.map((item, index) => (
                                             <tr key={item._id}>
-                                                <td>{item?.name}</td>
-                                                <td>{item?.short_name}</td>
-                                                <td>{item?.time}</td>
+                                                <td>{item.abbreviation}</td>
+                                                <td>{item.name}</td>
+                                                <td>{moment(item.updatedAt).format('HH:mm DD/MM/YYYY')}</td>
                                                 <td>
-                                                    <Button
-                                                        className="btn btn-danger"
+                                                    <FaTrash
+                                                        className="text-danger cursor-pointer"
                                                         onClick={() => {
-                                                            setShowConfirm(true);
                                                             setSelectedIndex(index);
+                                                            setShowConfirm(true);
                                                         }}
-                                                    >
-                                                        <FaTrash />
-                                                    </Button>
+                                                    />
                                                 </td>
                                             </tr>
                                         ))}
@@ -260,13 +262,19 @@ const ModalReceivingCustomer = ({ isShowModal, onClose, queueId, onCustomer, onU
                         </div>
                     </div>
                 </Modal.Body>
+
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={onClose}>
+                        Đóng
+                    </Button>
+                </Modal.Footer>
             </Modal>
 
             <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Xác nhận xóa dịch vụ</Modal.Title>
+                    <Modal.Title>Xác nhận</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>Bạn có chắc chắn muốn xóa dịch vụ này không?</Modal.Body>
+                <Modal.Body>Bạn có chắc muốn xóa dịch vụ này không?</Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowConfirm(false)}>
                         Hủy

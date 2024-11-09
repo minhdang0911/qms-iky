@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal, Form, Table, Input, Row, Col } from 'antd';
-import { PlusOutlined, EditOutlined, SaveOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
 import { apiCreateCategory, apiGetCategory, apiDeleteCategory, apiUpdateCategory } from '../apis/category';
 
 const ModalCategory = ({ isShowModal, onClose, token }) => {
-    const [formData, setFormData] = useState({ name: '', shortName: '', time: '' });
     const [name, setName] = useState('');
     const [time, setTime] = useState('');
     const [shortName, setShortName] = useState('');
@@ -73,6 +72,10 @@ const ModalCategory = ({ isShowModal, onClose, token }) => {
                     toast.error('Không thể cập nhật danh mục, vui lòng thử lại.');
                 }
             } else {
+                if (!name || !shortName || !time) {
+                    toast.error('Vui lòng nhập đầy đủ thông tin');
+                    return;
+                }
                 response = await apiCreateCategory(token, name, shortName, time);
                 if (response && response.result === 1) {
                     toast.success('Danh mục đã được tạo thành công!');

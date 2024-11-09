@@ -1,31 +1,23 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
-// import { apiCreateStore, apiGetStore, apiUpdateStore, apiDeleteStore } from '../../../api/store';
-import { toast } from 'react-toastify';
-import { Button, Form, Input, Table, Pagination, Modal, Space, Select } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Button, Form, Input, Table, Modal, Space, Select } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, ExportOutlined, SearchOutlined } from '@ant-design/icons';
-import * as XLSX from 'xlsx';
 import './ManageStore.scss';
 import axios from 'axios';
 import { apiStoreInfo } from '../../apis/store';
-// import { apiGetUserById } from '../../../api/user';
 import Cookies from 'js-cookie';
 
 const { Column } = Table;
 const { Option } = Select;
 
-const CreateStore = ({ dataUser }) => {
+const CreateStore = () => {
     const [formData, setFormData] = useState({ name: '', address: '' });
-    const [stores, setStores] = useState([]);
     const [editingStore, setEditingStore] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [confirmDelete, setConfirmDelete] = useState({ visible: false, id: null });
     const [page, setPage] = useState(1);
-    const [totalStores, setTotalStores] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
     const [changeHistoryModalVisible, setChangeHistoryModalVisible] = useState(false);
     const [selectedChangeHistory, setSelectedChangeHistory] = useState([]);
-    const [storeID, setStoreId] = useState([]);
-    const [userId, setUserId] = useState('');
     const [tinh, setTinh] = useState([]);
     const [quan, setQuan] = useState([]);
     const [phuong, setPhuong] = useState([]);
@@ -310,12 +302,6 @@ const CreateStore = ({ dataUser }) => {
     //     }
     //     setConfirmDelete({ visible: false, id: null });
     // }, [confirmDelete.id, fetchStores]);
-
-    const handleShowChangeHistory = (history) => {
-        console.log(history); // Kiểm tra dữ liệu history
-        setSelectedChangeHistory(history);
-        setChangeHistoryModalVisible(true);
-    };
 
     // const exportToExcel = async () => {
     //     const pageSize = 10;

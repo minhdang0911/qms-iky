@@ -46,6 +46,10 @@ const ModalTechnical = ({ dataUser, isShowModal, onClose }) => {
         const token = Cookies.get('Access token');
 
         if (selectedIndex === null) {
+            if (!name || !phone) {
+                toast.error('Vui lòng nhập đầy đủ thông tin');
+                return;
+            }
             // Thêm mới
             const response = await apiCreateTechnical(token, name, phone);
             if (response?.result === 1) {
